@@ -17,7 +17,7 @@ interface BookingItemProps {
 const BookingItem = ({ booking }: BookingItemProps) => {
   const finished = isPast(booking.date);
   return (
-    <Card>
+    <Card className="min-w-full">
       <CardContent className="px-0 py-0 flex">
         <div className="flex flex-col gap-2 py-5 pl-5 flex-[3]">
           <Badge variant={finished ? "secondary" : "default"} className="w-fit">
