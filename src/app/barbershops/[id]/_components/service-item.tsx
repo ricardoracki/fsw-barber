@@ -12,11 +12,14 @@ import {
 } from "@/components/ui/sheet";
 import { BarberShop, Service } from "@prisma/client";
 import { ptBR } from "date-fns/locale";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { generateDayTimeList } from "../_helpers/hours";
-import { format } from "date-fns";
+import { format, setHours, setMinutes } from "date-fns";
+import { currencyFormat } from "../_helpers/currency";
+import { saveBooking } from "../_actions/save-booking";
+import { Loader2 } from "lucide-react";
 
 interface ServiceItemProps {
   service: Service;
@@ -31,6 +34,9 @@ const ServiceItem = ({
 }: ServiceItemProps) => {
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [hour, setHour] = useState<String | undefined>(undefined);
+  const [submitIsLoading, setSubmitIsLoading] = useState(false);
+
+  const { data } = useSession();
 
   const handleButtonClick = () => {
     if (!isAuthenticated) {
@@ -47,6 +53,27 @@ const ServiceItem = ({
   const handleDateClick = (d: Date | undefined) => {
     setDate(d);
     setHour(undefined);
+  };
+
+  const handleBookingSubmit = async () => {
+    try {
+      if (!hour || !date || !data?.user) return;
+      setSubmitIsLoading(true);
+      const dateHour = Number(hour.split(":")[0]);
+      const dateMinutes = Number(hour.split(":")[1]);
+
+      const newDate = setMinutes(setHours(date, dateHour), dateMinutes);
+
+      await saveBooking({
+        serviceId: service.id,
+        barbershopId: barbershop.id,
+        date: newDate,
+        userId: (data.user as any).id,
+      });
+    } catch (error) {
+    } finally {
+      setSubmitIsLoading(false);
+    }
   };
 
   const timeList = useMemo(() => {
@@ -72,13 +99,9 @@ const ServiceItem = ({
             <p className="text-sm text-gray-400">{service.description}</p>
 
             <div className="flex items-center justify-between mt-3">
-              <p className="text-primary text-sm font-bold">{`${Intl.NumberFormat(
-                "pt-BR",
-                {
-                  style: "currency",
-                  currency: "BRL",
-                }
-              ).format(Number(service.price))}`}</p>
+              <p className="text-primary text-sm font-bold">{`${currencyFormat(
+                Number(service.price)
+              )}`}</p>
               <Sheet>
                 <SheetTrigger asChild>
                   <Button variant="secondary" onClick={handleButtonClick}>
@@ -144,13 +167,9 @@ const ServiceItem = ({
                       <CardContent className="p-3 gap-3 flex flex-col">
                         <div className="flex justify-between">
                           <h2 className="font-bold">{service.name}</h2>
-                          <h3 className="font-bold text-sm">{`${Intl.NumberFormat(
-                            "pt-BR",
-                            {
-                              style: "currency",
-                              currency: "BRL",
-                            }
-                          ).format(Number(service.price))}`}</h3>
+                          <h3 className="font-bold text-sm">{`${currencyFormat(
+                            Number(service.price)
+                          )}`}</h3>
                         </div>
 
                         {date && (
@@ -179,7 +198,15 @@ const ServiceItem = ({
                     </Card>
                   </div>
                   <SheetFooter className="px-5">
-                    <Button disabled={!hour || !date}>Confirmar</Button>
+                    <Button
+                      disabled={!hour || !date || submitIsLoading}
+                      onClick={handleBookingSubmit}
+                    >
+                      {submitIsLoading && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      {submitIsLoading ? "Salvando" : "Confirmar Reserva"}
+                    </Button>
                   </SheetFooter>
                 </SheetContent>
               </Sheet>
