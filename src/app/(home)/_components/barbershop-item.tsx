@@ -1,15 +1,23 @@
+"use client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { BarberShop } from "@prisma/client";
 import { StarIcon } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface BarberShopProps {
   barberShop: BarberShop;
 }
 
 const BarberShopItem = ({ barberShop }: BarberShopProps) => {
+  const router = useRouter();
+
+  const handleBookingClick = () => {
+    router.push(`/barbershops/${barberShop.id}`);
+  };
+
   return (
     <Card className="min-w-[167px] max-w-[167px] rounded-2xl">
       <CardContent className="px-1 pt-1 pb-0">
@@ -42,7 +50,11 @@ const BarberShopItem = ({ barberShop }: BarberShopProps) => {
           <p className="text-sm text-gray-400 overflow-hidden text-ellipsis text-nowrap">
             {barberShop.address}
           </p>
-          <Button className="w-full mt-3" variant={"secondary"}>
+          <Button
+            className="w-full mt-3"
+            variant={"secondary"}
+            onClick={handleBookingClick}
+          >
             Reservar
           </Button>
         </div>
