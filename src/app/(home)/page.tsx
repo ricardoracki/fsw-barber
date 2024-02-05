@@ -5,8 +5,8 @@ import Search from "./_components/search";
 import { db } from "@/prisma";
 import BarberShopItem from "./_components/barbershop-item";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
 import BookingItem from "@/components/booking-item";
+import { authOptions } from "@/lib/auth";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -35,7 +35,8 @@ export default async function Home() {
 
       <div className="px-5 pt-5">
         <h2 className="text-xl font-bold">
-          Olá, {session?.user?.name?.split(" ")[0] || "Seja bem vindo"}
+          Olá,{" "}
+          {session?.user?.name?.split(" ")[0] || "vamos agendar um corte hoje?"}
         </h2>
         <p className="capitalize text-sm">
           {format(new Date(), "EEEE', 'dd 'de' MMMM", { locale: ptBR })}
@@ -51,7 +52,7 @@ export default async function Home() {
           <h2 className="pl-5 text-xs uppercase text-gray-400 mb-3 font-bold">
             Agendamentos
           </h2>
-          <div className=" px-5 flex flex-row gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden">
+          <div className="px-5 flex flex-row gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden">
             {bookings.map((booking) => (
               <BookingItem key={booking.id} booking={booking} />
             ))}
