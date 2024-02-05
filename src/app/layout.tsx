@@ -19,10 +19,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} dark`}>
+      <body className={`${inter.className} dark flex flex-col`}>
         <AuthProvider>
-          <Toaster />
-          {children}
+          <div className="flex-1 ">
+            <Toaster />
+            {children}
+          </div>
           <Footer />
         </AuthProvider>
       </body>
