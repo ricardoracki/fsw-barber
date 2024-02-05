@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/prisma";
+import { revalidatePath } from "next/cache";
 
 interface SaveBookingParams {
   barbershopId: string;
@@ -19,4 +20,7 @@ export const saveBooking = async (params: SaveBookingParams) => {
       status: "Confirmado",
     },
   });
+
+  revalidatePath("/bookings");
+  revalidatePath("/");
 };
