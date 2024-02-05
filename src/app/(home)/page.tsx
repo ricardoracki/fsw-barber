@@ -54,7 +54,9 @@ export default async function Home() {
           </h2>
           <div className="px-5 flex flex-row gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden">
             {bookings.map((booking) => (
-              <BookingItem key={booking.id} booking={booking} />
+              <div key={booking.id} className="min-w-full max-w-full">
+                <BookingItem booking={booking} />
+              </div>
             ))}
           </div>
         </div>
